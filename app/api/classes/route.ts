@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const newClass = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
+      async (tx) => {
         return await tx.class.create({
           data: { name: sanitizedName },
         });

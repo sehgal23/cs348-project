@@ -9,7 +9,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
+      async (tx) => {
         await tx.class.delete({
           where: { id },
         });

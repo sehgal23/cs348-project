@@ -16,7 +16,7 @@ export async function PATCH(
       );
     }
     const updatedItem = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
+      async (tx) => {
         return await tx.item.update({
           where: { id },
           data: { completed },
@@ -42,7 +42,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
+      async (tx) => {
         await tx.item.delete({
           where: { id },
         });
