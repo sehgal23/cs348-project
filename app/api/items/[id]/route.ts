@@ -14,10 +14,17 @@ export async function PATCH(
         { status: 400 }
       );
     }
-    const updatedItem = await prisma.item.update({
-      where: { id },
-      data: { completed },
-    });
+    const updatedItem = await prisma.$transaction(
+      async (tx) => {
+        return await tx.item.update({
+          where: { id },
+          data: { completed },
+        });
+      },
+      {
+        isolationLevel: "ReadCommitted",
+      }
+    );
     return NextResponse.json(updatedItem);
   } catch (error) {
     return NextResponse.json(
@@ -33,9 +40,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.item.delete({
-      where: { id },
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.item.delete({
+          where: { id },
+        });
+      },
+      {
+        isolationLevel: "ReadCommitted",
+      }
+    );
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

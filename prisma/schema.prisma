@@ -29,4 +29,8 @@ model Item {
   completed Boolean  @default(false)
   classId   String
   class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@index([classId, tag])
+  @@index([classId, completed])
+  @@index([classId, dueDate])
 }

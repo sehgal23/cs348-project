@@ -26,9 +26,27 @@ export async function POST(request: Request) {
     if (!name || typeof name !== "string") {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
     }
-    const newClass = await prisma.class.create({
-      data: { name },
-    });
+
+    // Sanitized by trimming whitespace and removing special characters
+    const sanitizedName = name.trim().replace(/[^a-zA-Z0-9\s\-_]/g, "");
+
+    if (!sanitizedName) {
+      return NextResponse.json(
+        { error: "Class name cannot be empty after sanitization" },
+        { status: 400 }
+      );
+    }
+
+    const newClass = await prisma.$transaction(
+      async (tx) => {
+        return await tx.class.create({
+          data: { name: sanitizedName },
+        });
+      },
+      {
+        isolationLevel: "ReadCommitted",
+      }
+    );
     return NextResponse.json(newClass);
   } catch (error) {
     console.error("Error creating class:", error);

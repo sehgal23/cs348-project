@@ -7,9 +7,16 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    await prisma.class.delete({
-      where: { id },
-    });
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.class.delete({
+          where: { id },
+        });
+      },
+      {
+        isolationLevel: "ReadCommitted",
+      }
+    );
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

@@ -66,6 +66,17 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Sanitized by trimmming whitespace and removing special characters
+    const sanitizedName = name.trim().replace(/[^a-zA-Z0-9\s\-_]/g, "");
+
+    if (!sanitizedName) {
+      return NextResponse.json(
+        { error: "Item name cannot be empty after sanitization" },
+        { status: 400 }
+      );
+    }
+
     if (tag !== "assignment" && tag !== "midterm") {
       return NextResponse.json(
         { error: "Tag must be either 'assignment' or 'midterm'" },
@@ -80,14 +91,21 @@ export async function POST(request: Request) {
       dateObj = new Date(dueDate);
     }
 
-    const newItem = await prisma.item.create({
-      data: {
-        name,
-        tag,
-        dueDate: dateObj,
-        classId,
+    const newItem = await prisma.$transaction(
+      async (tx) => {
+        return await tx.item.create({
+          data: {
+            name: sanitizedName,
+            tag,
+            dueDate: dateObj,
+            classId,
+          },
+        });
       },
-    });
+      {
+        isolationLevel: "ReadCommitted",
+      }
+    );
     return NextResponse.json(newItem);
   } catch (error) {
     return NextResponse.json(
