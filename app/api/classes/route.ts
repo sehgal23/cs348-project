@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     }
 
     const newClass = await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         return await tx.class.create({
           data: { name: sanitizedName },
         });

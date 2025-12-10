@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
@@ -8,7 +9,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         await tx.class.delete({
           where: { id },
         });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
@@ -15,7 +16,7 @@ export async function PATCH(
       );
     }
     const updatedItem = await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         return await tx.item.update({
           where: { id },
           data: { completed },
@@ -41,7 +42,7 @@ export async function DELETE(
   try {
     const { id } = await params;
     await prisma.$transaction(
-      async (tx) => {
+      async (tx: Prisma.TransactionClient) => {
         await tx.item.delete({
           where: { id },
         });
