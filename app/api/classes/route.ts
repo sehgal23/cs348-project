@@ -40,6 +40,14 @@ export async function POST(request: Request) {
 
     const newClass = await prisma.$transaction(
       async (tx) => {
+        const existingClass = await tx.class.findFirst({
+          where: { name: sanitizedName },
+        });
+
+        if (existingClass) {
+          throw new Error("A class with this name already exists");
+        }
+
         return await tx.class.create({
           data: { name: sanitizedName },
         });
